@@ -27,16 +27,16 @@ This build uses Supabase email and password authentication. Email supports accou
 2. Open **SQL Editor**, paste the complete contents of `supabase/schema.sql`, and run it.
 3. In **Authentication → URL Configuration**, set the Site URL to the GitHub Pages URL you will use (for example `https://USERNAME.github.io/REPOSITORY/`) and add it to Redirect URLs.
 4. In **Authentication → Providers → Email**, enable email/password sign-in. For production, enable confirmation and configure an email provider; students will verify the address before they log in. Disable confirmation only for a controlled local demonstration.
-5. In **Project Settings → API**, copy the Project URL and public anon/publishable key into `js/config.js`:
+5. Click **Connect** in the project dashboard (or open **Project Settings → API Keys**) and copy the Project URL plus the **publishable key** (starts with `sb_publishable_`) into `js/config.js`. The legacy `anon` key also works, but Supabase is moving to publishable keys:
 
    ```js
    window.APP_CONFIG = {
      supabaseUrl: "https://YOUR-PROJECT-REF.supabase.co",
-     supabaseAnonKey: "YOUR_PUBLIC_ANON_KEY"
+     supabaseAnonKey: "sb_publishable_YOUR_PUBLIC_KEY"
    };
    ```
 
-   Never put the `service_role` key in this repository or browser code.
+   Never put a `sb_secret_` or legacy `service_role` key in this repository or browser code.
 6. Verify the SQL editor ran without errors. The signup trigger assigns a unique ID and creates an empty progress row. `submit_quiz_answer` validates the current question and answer inside Postgres; client code cannot write scores or read answer keys.
 
 The project relies on the database RPC and table names in this schema. If you change the schema, update the browser calls at the same time. For a live school deployment, periodically review Supabase Auth rate limits and database logs.

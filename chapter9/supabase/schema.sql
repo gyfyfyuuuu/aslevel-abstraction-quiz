@@ -77,10 +77,11 @@ end $$;
 
 create or replace function public.resume_quiz_question()
 returns jsonb language plpgsql security definer set search_path=public as $$
-declare uid uuid:=auth.uid(); p public.student_progress%rowtype;
+declare uid uuid:=auth.uid(); p public.student_progress%rowtype; max_sec integer; now_at timestamptz:=clock_timestamp();
 begin
  if uid is null then raise exception 'Sign in required'; end if;
- update public.student_progress set question_started_at=clock_timestamp() where student_id=uid and failed=false and challenge_completed=false returning * into p;
+ select case current_level when 1 then 40 when 2 then 90 else 150 end into max_sec from public.student_progress where student_id=uid;
+ update public.student_progress set active_seconds=active_seconds+least(max_sec,greatest(0,extract(epoch from (now_at-question_started_at))::int)),question_started_at=now_at where student_id=uid and failed=false and challenge_completed=false returning * into p;
  if not found then raise exception 'No active question'; end if;
  return to_jsonb(p);
 end $$;
